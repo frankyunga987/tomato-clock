@@ -1,36 +1,47 @@
 import React, { Component } from 'react'
-import { Card, Table, Tag, Space ,Checkbox  } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Space, Modal } from 'antd';
+import { data } from '../../config/todo_list'
+
+
 
 import './index.css';
 
-
+const list = data
 
 
 export default class TodoList extends Component {
-    // addTodo = (todoObj) => {
-    //     const { todos } = this.state
-    //     const newTodos = [todoObj, ...data]
-    //     this.setState({ todos: newTodos })
-    // }
-    
-    render() {
+    state = {
+        isModalVisible: 0,
 
+        data: []
+    }
 
-        const extra = (
-            <div>
-                <input  type="text" placeholder="輸入你的任務名稱" />
-                <button>+添加</button>
-            </div>
-        )
+    showAdd = () => {
+        this.setState({ isModalVisible: 1 });
+    };
 
-        const columns = [
-            
+    showChange = () => {
+        this.setState({ isModalVisible: 2 });
+    };
+
+    handleOk = () => {
+        this.setState({ isModalVisible: 0 });
+
+    };
+
+    handleCancel = () => {
+        this.setState({ isModalVisible: 0 });
+
+    };
+
+    initColums = () => {
+        this.columns = [
+
             {
                 title: '代辦事項',
                 dataIndex: 'name',
                 key: 'name',
-        
+
             },
             {
                 title: '標籤',
@@ -59,36 +70,53 @@ export default class TodoList extends Component {
                 key: 'action',
                 render: (text, record) => (
                     <Space size="middle">
-                        <a>準備倒數</a>
-                        <a>修改</a>
-                        <a>刪除</a>
+                        <button>準備倒數</button>
+                        <button onClick={this.showChange}>修改</button>
+                        <button>刪除</button>
                     </Space>
                 ),
             },
         ];
-        
-        const data = [
-            {
-                key: '1',
-                name: '吃飯',
-                tags: ['nice', 'developer'],
-            },
-            {
-                key: '2',
-                name: '打Code',
-                tags: ['loser'],
-            },
-            {
-                key: '3',
-                name: '運動',
-                tags: ['cool', 'teacher'],
-            },
-        ];
+
+    }
+
+    getData = () => {
+
+        this.setState({ data: list })
+    }
+
+    componentWillMount() {
+        this.initColums()
+        this.getData()
+    }
+
+    render() {
+        const { data, isModalVisible, } = this.state
+
+        const extra = (
+            <div>
+                <input type="text" placeholder="輸入你的任務名稱" />
+                <button onClick={this.showAdd}>+添加</button>
+            </div>
+        )
+
+
+
 
         return (
             <div className="card">
-                <Card title="代辦事項"  extra={extra} >
-                    <Table columns={columns} dataSource={data}/>
+                <Card title="代辦事項" extra={extra} >
+                    <Table columns={this.columns} dataSource={data} pagination={false} />
+                    <Modal title="添加任務事項" visible={isModalVisible === 1} onOk={this.handleOk} onCancel={this.handleCancel}>
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                    </Modal>
+                    <Modal title="修改任務事項" visible={isModalVisible === 2} onOk={this.handleOk} onCancel={this.handleCancel}>
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                        <p>Some contents...</p>
+                    </Modal>
                 </Card>
             </div>
         )
