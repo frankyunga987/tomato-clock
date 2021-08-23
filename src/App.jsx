@@ -12,7 +12,7 @@ export default class App extends Component {
         return (
             <div className="contain">
                 <Timer/>
-                <TodoList/>
+                <TodoList />
                 
             </div>
         )

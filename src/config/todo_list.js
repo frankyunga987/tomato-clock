@@ -6,17 +6,17 @@ export  const data = [
     {
         key: '1',
         name: '吃飯',
-        tags: ['nice', 'developer'],
+        remark: '隨便',
     },
     {
         key: '2',
         name: '打Code',
-        tags: ['loser'],
+        remark: '必要',
     },
     {
         key: '3',
         name: '運動',
-        tags: ['cool', 'teacher'],
+        remark: '隨便',
     },
 ];
 

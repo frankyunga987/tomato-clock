@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Card, Table, Tag, Space, Modal } from 'antd';
+import { Card, Table, Space, Modal } from 'antd';
 import { data } from '../../config/todo_list'
 
-
+import AddForm from '../AddForm'
+import ChangeForm from '../ChangeForm'
 
 import './index.css';
 
@@ -20,20 +21,57 @@ export default class TodoList extends Component {
         this.setState({ isModalVisible: 1 });
     };
 
-    showChange = () => {
-        this.setState({ isModalVisible: 2 });
+    showChange = (list) => {
+        console.log(list)
+        this.list = list
+        this.setState({ isModalVisible: 2, currentKey: list.key });
     };
 
-    handleOk = () => {
-        this.setState({ isModalVisible: 0 });
+    addList = () => {
+        const { data } = this.state
+        const list = { key: data.length + 1, name: this.state.addname, remark: this.state.addremark }
+        const newData = [list, ...data]
+
+        this.setState({ isModalVisible: 0, data: newData, });
+
+    };
+
+
+
+    changeList = () => {
+
+        const data = this.state.data.map(d => {
+            if (d.key === this.state.currentKey) {
+                d.name = this.state.name;
+                d.remark = this.state.remark;
+            }
+            return d
+        })
+
+
+        this.setState({ isModalVisible: 0, data, });
+
 
     };
 
     handleCancel = () => {
+
         this.setState({ isModalVisible: 0 });
 
     };
 
+    deleteList = (list) => {
+        const { data } = this.state
+        const newData = data.filter((d) => {
+            return d.key !== list.key
+        })
+        this.setState({ data: newData })
+    }
+
+    
+
+
+    // 獲取表格標題
     initColums = () => {
         this.columns = [
 
@@ -44,46 +82,34 @@ export default class TodoList extends Component {
 
             },
             {
-                title: '標籤',
+                title: '備註',
                 width: 250,
-                key: 'tags',
-                dataIndex: 'tags',
-                render: tags => (
-                    <>
-                        {tags.map(tag => {
-                            let color = tag.length > 5 ? 'geekblue' : 'green';
-                            if (tag === 'loser') {
-                                color = 'volcano';
-                            }
-                            return (
-                                <Tag color={color} key={tag}>
-                                    {tag.toUpperCase()}
-                                </Tag>
-                            );
-                        })}
-                    </>
-                ),
+                key: 'remark',
+                dataIndex: 'remark',
+
             },
             {
                 title: '操作',
                 width: 200,
                 key: 'action',
-                render: (text, record) => (
+                render: (list) => (
                     <Space size="middle">
                         <button>準備倒數</button>
-                        <button onClick={this.showChange}>修改</button>
-                        <button>刪除</button>
+                        <button onClick={() => this.showChange(list)}>修改</button>
+                        <button onClick={() => this.deleteList(list)}>刪除</button>
                     </Space>
                 ),
             },
         ];
 
     }
-
+    // 獲取表格資料
     getData = () => {
 
         this.setState({ data: list })
     }
+
+
 
     componentWillMount() {
         this.initColums()
@@ -91,12 +117,16 @@ export default class TodoList extends Component {
     }
 
     render() {
-        const { data, isModalVisible, } = this.state
+
+
+        const { data, isModalVisible } = this.state
+        const list = this.list || {}
+
 
         const extra = (
             <div>
-                <input type="text" placeholder="輸入你的任務名稱" />
-                <button onClick={this.showAdd}>+添加</button>
+
+                <button onClick={this.showAdd}>+添加任務事項</button>
             </div>
         )
 
@@ -107,15 +137,19 @@ export default class TodoList extends Component {
             <div className="card">
                 <Card title="代辦事項" extra={extra} >
                     <Table columns={this.columns} dataSource={data} pagination={false} />
-                    <Modal title="添加任務事項" visible={isModalVisible === 1} onOk={this.handleOk} onCancel={this.handleCancel}>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
+                    <Modal title="添加任務事項" visible={isModalVisible === 1} onOk={this.addList} onCancel={this.handleCancel}>
+                        <AddForm
+                            addName={(addname) => { this.setState({ addname }) }}
+                            addRemark={(addremark) => { this.setState({ addremark }) }}
+                        />
                     </Modal>
-                    <Modal title="修改任務事項" visible={isModalVisible === 2} onOk={this.handleOk} onCancel={this.handleCancel}>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
+                    <Modal title="修改任務事項" visible={isModalVisible === 2} onOk={this.changeList} onCancel={this.handleCancel}>
+                        <ChangeForm
+                            listName={list.name}
+                            listRemark={list.remark}
+                            setName={(name) => { this.setState({ name }) }}
+                            setRemark={(remark) => { this.setState({ remark }) }}
+                        />
                     </Modal>
                 </Card>
             </div>
