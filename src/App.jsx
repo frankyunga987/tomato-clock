@@ -8,11 +8,16 @@ import TodoList from './components/TodoList'
 
 
 export default class App extends Component {
+    state={
+        name:'',
+    }
     render() {
+        const {name}=this.state        
+
         return (
             <div className="contain">
-                <Timer/>
-                <TodoList />
+                <Timer name={name}/>
+                <TodoList getName={(name)=>{this.setState({name})}} />
                 
             </div>
         )

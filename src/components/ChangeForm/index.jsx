@@ -1,31 +1,33 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
+
 
 import { Form, Input } from 'antd';
 
 export default class ChangeForm extends Component {
-    static propTypes = {
-        setName: PropTypes.func.isRequired,
-        setRemark: PropTypes.func.isRequired
-    }
-
-    
-       
-    
+    changeFormRef = React.createRef()
 
     render() {
-       
-        
+
         return (
-            <Form initialValues={''}>
-                <Form.Item>
-                    <span>修改代辦事項名稱:</span>
-                    <Input onChange={(e)=>{this.props.setName(e.target.value)}} defaultValue={this.props.listName}/>
+            <Form
+                ref={this.changeFormRef}
+                initialValues={null}
+                onValuesChange={(v) => {
+                    if (v.name) {
+                        this.props.changeName(v.name);
+                    } else if (v.hint) {
+                        this.props.changeRemark(v.hint);
+                    }
+                }}
+            >
+                <span>修改代辦事項名稱:</span>
+                <Form.Item name="name">
+                    <Input />
                 </Form.Item>
 
-                <Form.Item>
                 <span>修改備註:</span>
-                    <Input onChange={(e)=>{this.props.setRemark(e.target.value)}} defaultValue={this.props.listRemark}/>
+                <Form.Item name="hint">
+                    <Input />
                 </Form.Item>
             </Form>
         )

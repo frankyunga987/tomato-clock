@@ -1,16 +1,22 @@
 import React, { Component } from 'react'
 
 
-import { PoweroffOutlined } from '@ant-design/icons';
+import { PoweroffOutlined, PauseOutlined, CaretRightOutlined } from '@ant-design/icons';
 import './index.css'
 
+
+
 export default class Timer extends Component {
+    play = React.createRef();
+    pause = React.createRef();
 
     state = {
         minute: '',
         second: '',
-        worktime: 60,
-        breaktime: 5,
+        breakMin: '',
+        breakSec: '',
+        worktime: 1500,
+        breaktime: 300,
         counting: false
     }
 
@@ -19,8 +25,11 @@ export default class Timer extends Component {
         // this.state.second = ("0" + Math.floor(this.state.worktime % 60)).substr(-2, 2);
         this.setState({
             minute: ("0" + Math.floor((this.state.worktime % 3600) / 60)).substr(-2, 2),
-            second: ("0" + Math.floor(this.state.worktime % 60)).substr(-2, 2)
+            second: ("0" + Math.floor(this.state.worktime % 60)).substr(-2, 2),
+            breakMin: ("0" + Math.floor((this.state.breaktime % 3600) / 60)).substr(-2, 2),
+            breakSec: ("0" + Math.floor(this.state.breaktime % 60)).substr(-2, 2),
         })
+
     }
 
 
@@ -28,16 +37,23 @@ export default class Timer extends Component {
     startWork = () => {
 
 
+
         if (this.state.counting) {
-            clearInterval(this.myInterval);
+            clearInterval(this.workInterval);
+            this.pause.current.style.display='none'
+            this.play.current.style.display='inline-block'
+
         } else {
-            this.myInterval = setInterval(() => {
+
+            this.play.current.style.display='none'
+            this.pause.current.style.display='inline-block'
+            this.workInterval = setInterval(() => {
 
 
                 this.setState({ worktime: this.state.worktime - 1 })
                 this.updateCounter()
                 if (this.state.worktime === 0) {
-                    clearInterval(this.myInterval)
+                    clearInterval(this.workInterval)
                     alert("可以休息5分鐘")
                 }
 
@@ -59,7 +75,7 @@ export default class Timer extends Component {
 
                 if (this.state.breaktime === 0) {
                     clearInterval(this.myInterval)
-                    alert("可以休息5分鐘")
+                    alert("休息結束")
                 }
 
             }, 1000)
@@ -68,14 +84,16 @@ export default class Timer extends Component {
     }
 
     restart = () => {
-        clearInterval(this.myInterval)
-        this.setState({ worktime: 60 }, () => this.updateCounter())
+        this.pause.current.style.display='none'
+        this.play.current.style.display='inline-block'
+        clearInterval(this.workInterval)
+        this.setState({ worktime: 1500 }, () => this.updateCounter())
     }
 
     render() {
-        const { breaktime, minute, second } = this.state
+        const { minute, second, breakMin, breakSec, } = this.state
 
-        
+
 
 
         return (
@@ -83,14 +101,21 @@ export default class Timer extends Component {
                 <span className="title">計時工作25分鐘,之後可以休息5分鐘</span>
                 <div>
                     <button
-                        className="button1"
+                        className="work-button"
                         onClick={this.startWork}
                     >
-                        <PoweroffOutlined />
+
+                        <CaretRightOutlined className="start" ref={this.play}/>
+
+                        <PauseOutlined className="pause" ref={this.pause}/>
+
                         <br />
                         <span>
-                            
-                            開始1分鐘倒數
+                            {this.props.name}
+                        </span>
+                        <br />
+                        <span>
+                            開始25分鐘倒數
                         </span>
                         <br />
                         {minute}:{second}
@@ -98,14 +123,18 @@ export default class Timer extends Component {
                     <button onClick={this.restart}>restart</button>
                     <button onClick={this.restart}>restart</button>
                     <button
-                        className="button2"
+                        className="rest-button"
                         onClick={this.startBreak}
                     >
                         <PoweroffOutlined />
                         <br />
-                        開始5秒倒數
+                        <span>
+                            休息
+                        </span>
                         <br />
-                        {breaktime}
+                        開始5分鐘倒數
+                        <br />
+                        {breakMin}:{breakSec}
                     </button>
 
                 </div>

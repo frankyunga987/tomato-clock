@@ -17,6 +17,11 @@ export default class TodoList extends Component {
         data: []
     }
 
+    giveName = (list) => {
+        this.props.getName(list.name)
+    }
+
+
     showAdd = () => {
         this.setState({ isModalVisible: 1 });
     };
@@ -33,7 +38,7 @@ export default class TodoList extends Component {
         const newData = [list, ...data]
 
         this.setState({ isModalVisible: 0, data: newData, });
-
+        this.addForm.addFormRef.current.resetFields();        
     };
 
 
@@ -50,7 +55,7 @@ export default class TodoList extends Component {
 
 
         this.setState({ isModalVisible: 0, data, });
-
+        this.changeForm.changeFormRef.current.resetFields();  
 
     };
 
@@ -68,7 +73,7 @@ export default class TodoList extends Component {
         this.setState({ data: newData })
     }
 
-    
+
 
 
     // 獲取表格標題
@@ -90,11 +95,11 @@ export default class TodoList extends Component {
             },
             {
                 title: '操作',
-                width: 200,
+                width: 300,
                 key: 'action',
                 render: (list) => (
                     <Space size="middle">
-                        <button>準備倒數</button>
+                        <button onClick={() => this.giveName(list)}>準備倒數</button>
                         <button onClick={() => this.showChange(list)}>修改</button>
                         <button onClick={() => this.deleteList(list)}>刪除</button>
                     </Space>
@@ -120,8 +125,6 @@ export default class TodoList extends Component {
 
 
         const { data, isModalVisible } = this.state
-        const list = this.list || {}
-
 
         const extra = (
             <div>
@@ -131,24 +134,22 @@ export default class TodoList extends Component {
         )
 
 
-
-
         return (
             <div className="card">
                 <Card title="代辦事項" extra={extra} >
                     <Table columns={this.columns} dataSource={data} pagination={false} />
                     <Modal title="添加任務事項" visible={isModalVisible === 1} onOk={this.addList} onCancel={this.handleCancel}>
                         <AddForm
+                            ref={ref => this.addForm = ref}
                             addName={(addname) => { this.setState({ addname }) }}
                             addRemark={(addremark) => { this.setState({ addremark }) }}
                         />
                     </Modal>
                     <Modal title="修改任務事項" visible={isModalVisible === 2} onOk={this.changeList} onCancel={this.handleCancel}>
                         <ChangeForm
-                            listName={list.name}
-                            listRemark={list.remark}
-                            setName={(name) => { this.setState({ name }) }}
-                            setRemark={(remark) => { this.setState({ remark }) }}
+                            ref={ref => this.changeForm = ref}
+                            changeName={(name) => { this.setState({ name }) }}
+                            changeRemark={(remark) => { this.setState({ remark }) }}
                         />
                     </Modal>
                 </Card>
