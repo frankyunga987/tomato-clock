@@ -16,6 +16,7 @@ export default class App extends Component {
 
         return (
             <div className="contain">
+                
                 <Timer name={name}/>
                 <TodoList getName={(name)=>{this.setState({name})}} />
                 

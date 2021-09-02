@@ -9,6 +9,8 @@ import './index.css'
 export default class Timer extends Component {
     play = React.createRef();
     pause = React.createRef();
+    breakplay = React.createRef();
+    breakpause = React.createRef();
 
     state = {
         minute: '',
@@ -17,7 +19,8 @@ export default class Timer extends Component {
         breakSec: '',
         worktime: 1500,
         breaktime: 300,
-        counting: false
+        counting: false,
+        breakcount:false,
     }
 
     updateCounter = () => {
@@ -35,18 +38,22 @@ export default class Timer extends Component {
 
 
     startWork = () => {
-
-
+        if (this.state.breakcount) {
+            clearInterval(this.restInterval);
+            this.breakpause.current.style.display = 'none'
+            this.breakplay.current.style.display = 'inline-block'
+            this.setState({ breakcount: !this.state.breakcount });
+        }
 
         if (this.state.counting) {
             clearInterval(this.workInterval);
-            this.pause.current.style.display='none'
-            this.play.current.style.display='inline-block'
+            this.pause.current.style.display = 'none'
+            this.play.current.style.display = 'inline-block'
 
         } else {
 
-            this.play.current.style.display='none'
-            this.pause.current.style.display='inline-block'
+            this.play.current.style.display = 'none'
+            this.pause.current.style.display = 'inline-block'
             this.workInterval = setInterval(() => {
 
 
@@ -66,28 +73,52 @@ export default class Timer extends Component {
 
     startBreak = () => {
 
-        if (this.state.counting) {
-            clearInterval(this.myInterval);
+        if(this.state.counting){
+            clearInterval(this.workInterval);
+            this.pause.current.style.display = 'none'
+            this.play.current.style.display = 'inline-block'
+            this.setState({ counting: !this.state.counting });
+        }
+
+        if (this.state.breakcount) {
+            clearInterval(this.restInterval);
+            this.breakpause.current.style.display = 'none'
+            this.breakplay.current.style.display = 'inline-block'
+
         } else {
-            this.myInterval = setInterval(() => {
+
+            this.breakplay.current.style.display = 'none'
+            this.breakpause.current.style.display = 'inline-block'
+            this.restInterval = setInterval(() => {
+
 
                 this.setState({ breaktime: this.state.breaktime - 1 })
-
+                this.updateCounter()
                 if (this.state.breaktime === 0) {
-                    clearInterval(this.myInterval)
+                    clearInterval(this.restInterval)
                     alert("休息結束")
                 }
 
             }, 1000)
         }
-        this.setState({ counting: !this.state.counting });
+        this.setState({ breakcount: !this.state.breakcount });
+
     }
 
     restart = () => {
-        this.pause.current.style.display='none'
-        this.play.current.style.display='inline-block'
+        this.pause.current.style.display = 'none'
+        this.play.current.style.display = 'inline-block'
         clearInterval(this.workInterval)
+        this.setState({ counting: false });
         this.setState({ worktime: 1500 }, () => this.updateCounter())
+    }
+
+    restartRest = () => {
+        this.breakpause.current.style.display = 'none'
+        this.breakplay.current.style.display = 'inline-block'
+        clearInterval(this.restInterval)
+        this.setState({ breakcount: false});
+        this.setState({ breaktime: 300 }, () => this.updateCounter())
     }
 
     render() {
@@ -104,10 +135,8 @@ export default class Timer extends Component {
                         className="work-button"
                         onClick={this.startWork}
                     >
-
-                        <CaretRightOutlined className="start" ref={this.play}/>
-
-                        <PauseOutlined className="pause" ref={this.pause}/>
+                        <CaretRightOutlined className="start" ref={this.play} />
+                        <PauseOutlined className="pause" ref={this.pause} />
 
                         <br />
                         <span>
@@ -120,13 +149,15 @@ export default class Timer extends Component {
                         <br />
                         {minute}:{second}
                     </button>
-                    <button onClick={this.restart}>restart</button>
-                    <button onClick={this.restart}>restart</button>
+                    <button onClick={this.restart}>重置工作倒數</button>
+                    <button onClick={this.restartRest}>重置休息倒數</button>
                     <button
                         className="rest-button"
                         onClick={this.startBreak}
                     >
-                        <PoweroffOutlined />
+                        <CaretRightOutlined className="start" ref={this.breakplay} />
+                        <PauseOutlined className="pause" ref={this.breakpause} />
+
                         <br />
                         <span>
                             休息
